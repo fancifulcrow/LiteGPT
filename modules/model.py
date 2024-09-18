@@ -7,6 +7,8 @@ class LiteGPT(nn.Module):
     def __init__(self, vocab_size:int, context_length:int, embedding_dim=256, num_heads=8, num_layers=4, ff_dim=512, dropout=0.1) -> None:
         super().__init__()
 
+        self.context_length = context_length
+
         self.token_embedding = nn.Embedding(vocab_size, embedding_dim)
         self.position_embedding = nn.Embedding(context_length, embedding_dim)
         
@@ -37,17 +39,4 @@ class LiteGPT(nn.Module):
         logits = self.head(x)
 
         return logits
-    
-    def generate(self, input_ids:torch.Tensor, max_new_tokens=50, temperature=1.0, top_k=50):
-        self.eval()
-        with torch.no_grad():
-            for _ in range(max_new_tokens):
-                logits = self.forward(input_ids)
-                logits = logits[:, -1, :] / temperature
-                if top_k is not None:
-                    values, indices = torch.topk(logits, top_k)
-                    logits = torch.full_like(logits, -float('Inf')).scatter_(1, indices, values)
-                probs = F.softmax(logits, dim=-1)
-                next_token = torch.multinomial(probs, num_samples=1)
-                input_ids = torch.cat([input_ids, next_token], dim=1)
-        return input_ids
+
