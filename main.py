@@ -1,7 +1,8 @@
 from modules.data import TextDataset, load_data
 from modules.model import LiteGPT
 from modules.train import train
-from modules.utils import count_parameters, generate_text
+from modules.evaluate import generate_text
+from modules.utils import count_parameters, loss_curve
 
 import torch
 import torch.nn as nn
@@ -9,6 +10,7 @@ from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 import tiktoken
 import yaml
+import os
 
 
 config_file_path = "config/config.yaml"
@@ -50,17 +52,14 @@ def main() -> None:
 
     losses = train(model, optimizer, criterion, dataloader, config["training"]["num_epochs"], device)
 
-    plt.plot(losses)
-    plt.xlabel('Step')
-    plt.ylabel('Loss')
-    plt.title('Training Loss')
-    plt.show()
+    loss_curve(losses, title="Training Loss")
 
     prompt = "I believe that "
-    generated_text = generate_text(model, tokenizer, prompt, temperature=0.8)
+    generated_text = generate_text(model, tokenizer, prompt)
 
     print(generated_text)
 
+    os.makedirs("models", exist_ok=True)
     model_save_path = "models/litegpt_model.pth"
     torch.save(model.state_dict(), model_save_path)
     print(f"Model saved to {model_save_path}")

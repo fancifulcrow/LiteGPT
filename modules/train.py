@@ -11,8 +11,7 @@ def train(model, optimizer, criterion, dataloader, num_epochs:int, device) -> li
         progress_bar = tqdm(dataloader, desc=f"Epoch {epoch+1}/{num_epochs}", unit="batch")
 
         for batch_idx, (input_ids, target_ids) in enumerate(progress_bar):
-            input_ids = input_ids.to(device)
-            target_ids = target_ids.to(device)
+            input_ids, target_ids = input_ids.to(device), target_ids.to(device)
             
             optimizer.zero_grad()
             logits = model(input_ids)
