@@ -1,0 +1,16 @@
+model:
+  context_length: 128
+  embedding_dim: 256
+  num_heads: 8
+  num_layers: 4
+  ff_dim: 512
+  dropout: 0.1
+
+data:
+  path: "data"
+  stride: 64
+
+training:
+  batch_size: 32
+  num_epochs: 10
+  learning_rate: 1e-4
