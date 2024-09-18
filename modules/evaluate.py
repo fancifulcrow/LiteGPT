@@ -1,5 +1,6 @@
 import torch
 import torch.nn.functional as F
+from tqdm import tqdm
 
 def generate_text(model, tokenizer, prompt, max_new_tokens=128, temperature=1.0, top_k=50, device=None) -> str:
     if device is None:
@@ -37,3 +38,42 @@ def top_k_accuracy(output, target, k=5) -> float:
     return accuracy
 
 
+def evaluate(model, criterion, dataloader, device, k=5) -> tuple[float, float]:
+    model.eval()
+
+    running_loss = 0.0
+    running_top_k_acc = 0.0
+    total_batches = 0
+
+    progress_bar = tqdm(dataloader, desc="Evaluating", unit="batch")
+
+    with torch.no_grad():
+        for _, (input_ids, target_ids) in enumerate(progress_bar):
+            input_ids, target_ids = input_ids.to(device), target_ids.to(device)
+
+            logits = model(input_ids)
+
+            loss = criterion(logits.view(-1, logits.size(-1)), target_ids.view(-1))
+            running_loss += loss.item()
+
+            batch_size, seq_length, num_classes = logits.size()
+
+            top_k_acc = top_k_accuracy(
+                logits.view(batch_size * seq_length, num_classes),
+                target_ids.view(batch_size * seq_length), 
+                k=k
+            )
+
+            running_top_k_acc += top_k_acc
+
+            total_batches += 1
+
+            progress_bar.set_postfix({
+                "loss": running_loss / total_batches, 
+                f"top-{k}-acc": running_top_k_acc / total_batches
+            })
+
+    average_loss = running_loss / total_batches
+    average_top_k_accuracy = running_top_k_acc / total_batches
+
+    return average_loss, average_top_k_accuracy
