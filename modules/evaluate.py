@@ -11,7 +11,7 @@ def generate_text(model, tokenizer, prompt, max_new_tokens=128, temperature=1.0,
 
     model.eval()
     with torch.no_grad():
-        for _ in range(max_new_tokens):
+        for _ in tqdm(range(max_new_tokens), desc="Generating tokens"):
             input_ids_cond = input_ids[:, -model.context_length:]
             logits = model(input_ids_cond)
             logits = logits[:, -1, :] / temperature
