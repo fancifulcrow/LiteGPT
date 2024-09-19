@@ -1,6 +1,7 @@
 import torch
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, random_split, Subset
 import os
+
 
 class TextDataset(Dataset):
     def __init__(self, text:str, tokenizer, context_length:int, stride:int) -> None:
@@ -35,3 +36,13 @@ def load_data(folder_path:str) -> str:
                 text += f.read() + "\n"
 
     return text
+
+
+def split_dataset(dataset, train_size=0.8) -> tuple[Subset, Subset]:
+    num_samples = len(dataset)
+    train_length = int(train_size * num_samples)
+    test_length = num_samples - train_length
+    
+    train_dataset, test_dataset = random_split(dataset, [train_length, test_length])
+
+    return train_dataset, test_dataset
