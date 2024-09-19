@@ -19,7 +19,7 @@ You can customize your model through the `config/config.yaml` file. It allows yo
 
 ## The Pre-Trained Model
 
-The pre-trained LiteGPT model is available for download [here](#). It has almost **28 million** parameters.
+The pre-trained LiteGPT model is available for download [here](https://github.com/fancifulcrow/LiteGPT/releases/download/v0.0.1/litegpt_model.pth). It has almost **28 million** parameters.
 
 ### Tokenization
 LiteGPT utilizes the **GPT-2 tokenizer** from the `tiktoken` library.
@@ -45,13 +45,14 @@ The model achieve the following metrics on the test set:
 - **Top-5 Accuracy:** 55.9533%
 - **Perplexity**: 41.3594
 
-### Generations
+### Generated Samples
 
-prompt: ``
+> ‘Very strange conditions.“And and the hall, and it all these days on the function of the duster had removed to misery; but you, ‘Excellent man G, however, the Union Jack with matters which I desired to wear to my mind of Safie had been in the banking institute; I had cramped and the beings of a cool and break a haunting loneliness sometimes, when sunk in Jackson” said Tom’s body was the side, with a dead hare just supposed to follow at me, I have only his waylott’ve got mixed in October were written in his profession
 
-```
+> It’s father, and I believe, “You shall the drink, in the changes made the untid and to. They seemed to be seen except to our to remember the ramble of the class. Hudson is the first believed them to Found a day, they had never set a minute, I am now,“Were there was about the steps which I heard a companion had, but confirm his eyes under my hand, or none, we erected a widower and to the eaves. But the edge of those of men.” 
 
-```
+
+> It was the scent and peeping sit there is entirely the watchers of the Grand Canal; the surname of the real young the dawn be convinced, but she insisted. And she had left, and I endeavoured to the words of Switzerland, and I would have watched by a romantic manner, and his daughter attended him up the favourite plan, I said the receptacle of grief and you possibly find the whole he informed me. The shutting to fetch his face peeled
 
 ## Additional Reading
 
