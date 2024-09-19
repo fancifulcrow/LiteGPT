@@ -8,7 +8,6 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 import tiktoken
-import yaml
 import os
 import math
 
