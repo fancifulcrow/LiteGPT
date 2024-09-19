@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import yaml
 
 
 def count_parameters(model) -> int:
@@ -14,3 +15,10 @@ def loss_curve(losses:list[float], title:str) -> None:
     plt.grid(True)
     
     plt.savefig("loss_curve.png")
+
+
+def load_configuration(config_path:str) -> dict:
+    with open(config_path, mode="r") as f:
+        config = yaml.safe_load(f)
+
+    return config

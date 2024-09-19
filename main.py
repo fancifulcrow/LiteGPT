@@ -1,8 +1,8 @@
 from modules.data import TextDataset, load_data, split_dataset
 from modules.model import LiteGPT
 from modules.train import train
-from modules.evaluate import generate_text, evaluate
-from modules.utils import count_parameters, loss_curve
+from modules.eval import generate_text, evaluate
+from modules.utils import count_parameters, loss_curve, load_configuration
 
 import torch
 import torch.nn as nn
@@ -14,16 +14,14 @@ import math
 
 import warnings
 
-warnings.filterwarnings("ignore")
-
-config_file_path = "config/config.yaml"
-
-with open(config_file_path, mode="r") as f:
-    config = yaml.safe_load(f)
-
 
 def main() -> None:
+    warnings.filterwarnings("ignore")
+
     torch.manual_seed(42)
+
+    config_path = "config/config.yaml"
+    config = load_configuration(config_path)
     
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
