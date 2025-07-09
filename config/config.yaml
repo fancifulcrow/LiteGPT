@@ -7,11 +7,11 @@ model:
   dropout: 0.1
 
 data:
-  path: "data"
-  stride: 64
+  path: "./data"
+  stride: 96
+  num_workers: 4
 
 training:
   batch_size: 32
-  num_epochs: 100
+  num_epochs: 1
   learning_rate: 0.001
-

@@ -7,7 +7,7 @@ def count_parameters(model) -> int:
 
 
 def loss_curve(losses:list[float], title:str) -> None:
-    plt.figure(figsize=(16, 9))
+    plt.figure(figsize=(8, 6))
     plt.plot(losses)
     plt.title(f"{title.title()}")
     plt.xlabel("Step")

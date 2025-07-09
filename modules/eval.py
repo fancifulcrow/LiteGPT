@@ -1,35 +1,38 @@
 import torch
-import torch.nn.functional as F
+import torch.nn as nn
 from tqdm import tqdm
+from typing import Optional, Tuple
 
-def generate_text(model, tokenizer, prompt, max_new_tokens=128, temperature=1.0, top_k=50, device=None) -> str:
+from .models import LiteGPT
+
+
+def generate_text(
+        model: LiteGPT, 
+        tokenizer, 
+        prompt, 
+        max_new_tokens: int = 128, 
+        temperature: float = 1.0, 
+        top_k: int = 0, 
+        device: Optional[str] = None
+    ) -> str:
     if device is None:
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    
-    model.to(device)
-    input_ids = torch.tensor([tokenizer.encode(prompt)], dtype=torch.long).to(device)
+        device = "cuda" if torch.cuda.is_available() else "cpu"
 
     model.eval()
-    with torch.no_grad():
-        for _ in tqdm(range(max_new_tokens), desc="Generating tokens"):
-            input_ids_cond = input_ids[:, -model.context_length:]
-            logits = model(input_ids_cond)
-            logits = logits[:, -1, :] / temperature
+    model.to(device)
 
-            if top_k is not None:
-                values, indices = torch.topk(logits, top_k)
-                logits = torch.full_like(logits, -float('Inf')).scatter_(1, indices, values)
+    # Encode using tiktoken
+    input_ids = tokenizer.encode(prompt) # (seq_len)
+    input_ids = torch.tensor([input_ids], dtype=torch.long).to(device)  # (1, seq_len)
 
-            probs = F.softmax(logits, dim=-1)
-            next_token = torch.multinomial(probs, num_samples=1).squeeze(-1)
-            input_ids = torch.cat([input_ids, next_token.unsqueeze(0)], dim=1)
+    input_ids = model.generate(input_ids, max_new_tokens=max_new_tokens, temperature=temperature, top_k=top_k)
 
-    generated_text = tokenizer.decode(input_ids[0].tolist())
-
-    return generated_text
+    # Decode using tiktoken
+    output_ids = input_ids[0].tolist()
+    return tokenizer.decode(output_ids)
 
 
-def top_k_accuracy(output, target, k=5) -> float:
+def top_k_accuracy(output: torch.Tensor, target: torch.Tensor, k: int) -> float:
     topk = torch.topk(output, k=k, dim=1).indices
     correct = topk.eq(target.view(-1, 1).expand_as(topk))
     correct_total = correct.sum().item()
@@ -38,12 +41,14 @@ def top_k_accuracy(output, target, k=5) -> float:
     return accuracy
 
 
-def evaluate(model, criterion, dataloader, device, k=5) -> tuple[float, float]:
+def evaluate(model: LiteGPT, dataloader: torch.utils.data.DataLoader, device: Optional[str], k: int = 5) -> Tuple[float, float]:
     model.eval()
 
     running_loss = 0.0
     running_top_k_acc = 0.0
     total_batches = 0
+
+    criterion = nn.CrossEntropyLoss()
 
     progress_bar = tqdm(dataloader, desc="Evaluating", unit="batch")
 

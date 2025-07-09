@@ -1,6 +1,6 @@
 from modules.data import TextDataset, load_data, split_dataset
-from modules.model import LiteGPT
-from modules.train import train
+from modules.models import LiteGPT
+from modules.training import train_gpt
 from modules.eval import generate_text, evaluate
 from modules.utils import count_parameters, loss_curve, load_configuration
 
@@ -37,13 +37,13 @@ def main() -> None:
 
     train_dataset, test_dataset = split_dataset(dataset, train_size=0.8)
 
-    train_dataloader = DataLoader(train_dataset, batch_size=config["training"]["batch_size"], shuffle=True, drop_last=True)
-    test_dataloader = DataLoader(test_dataset, batch_size=config["training"]["batch_size"], shuffle=True, drop_last=True)
+    train_dataloader = DataLoader(train_dataset, batch_size=config["training"]["batch_size"], shuffle=True, drop_last=True, num_workers=config["data"]["num_workers"])
+    test_dataloader = DataLoader(test_dataset, batch_size=config["training"]["batch_size"], shuffle=True, drop_last=True, num_workers=config["data"]["num_workers"])
 
     model = LiteGPT(
         vocab_size=vocab_size,
         context_length=config["model"]["context_length"],
-        embedding_dim=config["model"]["embedding_dim"],
+        d_model=config["model"]["embedding_dim"],
         num_heads=config["model"]["num_heads"],
         num_layers=config["model"]["num_layers"],
         ff_dim=config["model"]["ff_dim"],
@@ -51,11 +51,10 @@ def main() -> None:
     ).to(device)
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=config["training"]["learning_rate"])
-    criterion = nn.CrossEntropyLoss()
 
     print(f"Total Number of Parameters: {count_parameters(model)}")
 
-    losses = train(model, optimizer, criterion, train_dataloader, config["training"]["num_epochs"], device)
+    losses = train_gpt(model, optimizer, train_dataloader, config["training"]["num_epochs"], device)
 
     loss_curve(losses, title="Training Loss")
 
@@ -69,7 +68,7 @@ def main() -> None:
     torch.save(model.state_dict(), model_save_path)
     print(f"Model saved to {model_save_path}")
 
-    test_loss, top_k_acc = evaluate(model, criterion, test_dataloader, device)
+    test_loss, top_k_acc = evaluate(model, test_dataloader, device)
 
     print(f"Test Loss: {test_loss}")
     print(f"Top-5 Accuracy: {top_k_acc * 100:.4f}%")

@@ -1,4 +1,4 @@
-from modules.model import LiteGPT
+from modules.models import LiteGPT
 from modules.data import TextDataset, load_data, split_dataset
 from modules.eval import evaluate, generate_text
 from modules.utils import count_parameters, load_configuration
@@ -38,7 +38,7 @@ def main() -> None:
     model = LiteGPT(
         vocab_size=vocab_size,
         context_length=config["model"]["context_length"],
-        embedding_dim=config["model"]["embedding_dim"],
+        d_model=config["model"]["embedding_dim"],
         num_heads=config["model"]["num_heads"],
         num_layers=config["model"]["num_layers"],
         ff_dim=config["model"]["ff_dim"],
