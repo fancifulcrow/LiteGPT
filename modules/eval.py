@@ -3,7 +3,7 @@ import torch.nn as nn
 from tqdm import tqdm
 from typing import Optional, Tuple
 
-from .models import LiteGPT
+from .model import LiteGPT
 
 
 def generate_text(
@@ -12,7 +12,8 @@ def generate_text(
         prompt, 
         max_new_tokens: int = 128, 
         temperature: float = 1.0, 
-        top_k: int = 0, 
+        top_p: float = 1.0,
+        top_k: Optional[int] = None, 
         device: Optional[str] = None
     ) -> str:
     if device is None:
@@ -25,10 +26,11 @@ def generate_text(
     input_ids = tokenizer.encode(prompt) # (seq_len)
     input_ids = torch.tensor([input_ids], dtype=torch.long).to(device)  # (1, seq_len)
 
-    input_ids = model.generate(input_ids, max_new_tokens=max_new_tokens, temperature=temperature, top_k=top_k)
+    input_ids = model.generate(input_ids, max_new_tokens=max_new_tokens, temperature=temperature, top_p=top_p, top_k=top_k)
 
     # Decode using tiktoken
     output_ids = input_ids[0].tolist()
+    
     return tokenizer.decode(output_ids)
 
 

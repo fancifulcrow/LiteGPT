@@ -10,7 +10,7 @@ def loss_curve(losses:list[float], title:str) -> None:
     plt.figure(figsize=(8, 6))
     plt.plot(losses)
     plt.title(f"{title.title()}")
-    plt.xlabel("Step")
+    plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.grid(True)
     

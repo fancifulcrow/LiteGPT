@@ -1,6 +1,6 @@
 model:
   context_length: 128
-  embedding_dim: 256
+  d_model: 256
   num_heads: 8
   num_layers: 4
   ff_dim: 512
@@ -8,7 +8,7 @@ model:
 
 data:
   path: "./data"
-  stride: 96
+  stride: 64
   num_workers: 4
 
 training:

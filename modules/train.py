@@ -3,7 +3,7 @@ import torch.nn as nn
 from tqdm import tqdm
 from typing import List, Optional
 
-from .models import LiteGPT
+from .model import LiteGPT
 
 
 def train_gpt(
@@ -21,7 +21,7 @@ def train_gpt(
     model.to(device)
     model.train()
 
-    losses = []
+    epoch_losses = []
     criterion = nn.CrossEntropyLoss()
 
     for epoch in range(num_epochs):
@@ -42,11 +42,12 @@ def train_gpt(
             optimizer.step()
 
             running_loss += loss.item()
-            losses.append(loss.item())
 
             progress_bar.set_postfix({"loss": running_loss / (batch_idx + 1)})
+
+        epoch_losses.append(running_loss / len(dataloader))
 
         if scheduler is not None:
             scheduler.step()
 
-    return losses
+    return epoch_losses

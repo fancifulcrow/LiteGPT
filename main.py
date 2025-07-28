@@ -1,41 +1,33 @@
-from modules.data import TextDataset, load_data, split_dataset
-from modules.models import LiteGPT
-from modules.training import train_gpt
+from modules.dataset import TextDataset, split_dataset
+from modules.model import LiteGPT
+from modules.train import train_gpt
 from modules.eval import generate_text, evaluate
 from modules.utils import count_parameters, loss_curve, load_configuration
 
 import torch
-import torch.nn as nn
 from torch.utils.data import DataLoader
 import tiktoken
 import os
 import math
 
-import warnings
-
 
 def main() -> None:
-    warnings.filterwarnings("ignore")
-
-    torch.manual_seed(42)
-
     config_path = "config/config.yaml"
     config = load_configuration(config_path)
     
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    data = load_data(folder_path=config["data"]["path"])
     tokenizer = tiktoken.get_encoding("gpt2")
     vocab_size = tokenizer.n_vocab
 
     dataset = TextDataset(
-        text=data,
         tokenizer=tokenizer, 
-        context_length=config["model"]["context_length"], 
-        stride=config["data"]["stride"]
+        context_length=config["model"]["context_length"],
+        stride=config["data"]["stride"],
+        folder_path=config["data"]["path"]
     )
 
-    train_dataset, test_dataset = split_dataset(dataset, train_size=0.8)
+    train_dataset, test_dataset = split_dataset(dataset, train_size=0.8, random_state=42)
 
     train_dataloader = DataLoader(train_dataset, batch_size=config["training"]["batch_size"], shuffle=True, drop_last=True, num_workers=config["data"]["num_workers"])
     test_dataloader = DataLoader(test_dataset, batch_size=config["training"]["batch_size"], shuffle=True, drop_last=True, num_workers=config["data"]["num_workers"])
@@ -43,7 +35,7 @@ def main() -> None:
     model = LiteGPT(
         vocab_size=vocab_size,
         context_length=config["model"]["context_length"],
-        d_model=config["model"]["embedding_dim"],
+        d_model=config["model"]["d_model"],
         num_heads=config["model"]["num_heads"],
         num_layers=config["model"]["num_layers"],
         ff_dim=config["model"]["ff_dim"],
