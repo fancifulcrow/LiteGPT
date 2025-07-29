@@ -15,6 +15,7 @@ def loss_curve(losses:list[float], title:str) -> None:
     plt.grid(True)
     
     plt.savefig("loss_curve.png")
+    plt.close()
 
 
 def load_configuration(config_path:str) -> dict:
