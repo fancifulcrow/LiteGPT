@@ -8,7 +8,7 @@ model:
 
 data:
   path: "./data"
-  stride: 64
+  stride: 1
   num_workers: 4
 
 training:
