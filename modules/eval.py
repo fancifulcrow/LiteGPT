@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 from tqdm import tqdm
 from typing import Optional, Tuple
+import logging
+import math
 
 from .model import LiteGPT
 
@@ -43,7 +45,12 @@ def top_k_accuracy(output: torch.Tensor, target: torch.Tensor, k: int) -> float:
     return accuracy
 
 
-def evaluate(model: LiteGPT, dataloader: torch.utils.data.DataLoader, device: Optional[str], k: int = 5) -> Tuple[float, float]:
+def evaluate_gpt(
+        model: LiteGPT, 
+        dataloader: torch.utils.data.DataLoader, 
+        device: Optional[str], 
+        k: int = 5
+    ) -> Tuple[float, float, float]:
     model.eval()
 
     running_loss = 0.0
@@ -82,5 +89,10 @@ def evaluate(model: LiteGPT, dataloader: torch.utils.data.DataLoader, device: Op
 
     average_loss = running_loss / total_batches
     average_top_k_accuracy = running_top_k_acc / total_batches
+    perplexity = math.exp(average_loss) # Perplexity = e^{cross_entropy_loss}
 
-    return average_loss, average_top_k_accuracy
+    logging.info(f"Test Loss: {average_loss}")
+    logging.info(f"Top-{k} Accuracy: {average_top_k_accuracy}")
+    logging.info(f"Perplexity: {perplexity}")
+
+    return average_loss, average_top_k_accuracy, perplexity

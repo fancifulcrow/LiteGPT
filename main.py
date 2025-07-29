@@ -1,15 +1,14 @@
 from modules.dataset import TextDataset, split_dataset
 from modules.model import LiteGPT
 from modules.train import train_gpt
-from modules.eval import generate_text, evaluate
+from modules.eval import generate_text, evaluate_gpt
 from modules.utils import count_parameters, loss_curve, load_configuration
 
 import argparse
 import torch
 from torch.utils.data import DataLoader
 import tiktoken
-import os
-import math
+import logging
 
 
 def main() -> None:
@@ -20,7 +19,19 @@ def main() -> None:
     parser.add_argument("--weights", type=str, help="Path to the model weights in .pth file")
     args = parser.parse_args()
 
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s | %(levelname)s | %(message)s",
+        handlers=[
+            logging.FileHandler("file.log", mode="w")
+        ]
+    )
+
+    logging.info(f"Running in {args.mode.upper()} mode")
+
+    logging.info(f"Command-line arguments: {vars(args)}")
     config = load_configuration(args.config)
+    logging.info(f"Configuration:\n {config}")
     
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -41,6 +52,7 @@ def main() -> None:
     batch_size = config["training"]["batch_size"]
     learning_rate = config["training"]["learning_rate"]
     num_epochs = config["training"]["num_epochs"]
+    use_scheduler = config["training"]["use_scheduler"]
 
     dataset = TextDataset(
         tokenizer=tokenizer, 
@@ -64,29 +76,46 @@ def main() -> None:
         dropout=dropout
     ).to(device)
 
+    is_trained = False
+
+    if args.weights:
+        is_trained = True
+        model.load_state_dict(torch.load(args.weights, map_location=device))
+        print(f"Loaded pretrained LiteGPT weights from {args.weights}")
+        logging.info(f"Loaded pretrained LiteGPT weights from {args.weights}")
+
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epochs) if use_scheduler else None
 
     print(f"Total Number of Parameters: {count_parameters(model)}")
+    logging.info(f"Total Number of Parameters: {count_parameters(model)}")
 
-    losses = train_gpt(model, optimizer, train_dataloader, num_epochs, device)
+    # Train
+    if args.mode in {"train"}:
+        losses = train_gpt(model, optimizer, train_dataloader, num_epochs, device, scheduler=scheduler)
+        loss_curve(losses, title="Training Loss")
+        is_trained = True
 
-    loss_curve(losses, title="Training Loss")
+    # Evaluate
+    if args.mode in {"train", "evaluate"}:
+        if not is_trained:
+            raise ValueError("Evaluation requires a pretrained model. Specify with --weights or train from scratch")
 
-    prompt = args.prompt
-    generated_text = generate_text(model, tokenizer, prompt)
+        test_loss, top_k_acc, perplexity = evaluate_gpt(model, test_dataloader, device)
 
-    print(generated_text)
+        print(f"Test Loss: {test_loss}")
+        print(f"Top-5 Accuracy: {top_k_acc * 100:.4f}%")
+        print(f"Perplexity: {perplexity}")
 
-    os.makedirs("models", exist_ok=True)
-    model_save_path = "models/litegpt_model.pth"
-    torch.save(model.state_dict(), model_save_path)
-    print(f"Model saved to {model_save_path}")
+    # Inference
+    if args.mode in {"train", "evaluate", "inference"}:
+        if not is_trained:
+            raise ValueError("Inference requires a pretrained model. Specify with --weights or train from scratch")
 
-    test_loss, top_k_acc = evaluate(model, test_dataloader, device)
+        prompt = args.prompt
+        generated_text = generate_text(model, tokenizer, prompt)
 
-    print(f"Test Loss: {test_loss}")
-    print(f"Top-5 Accuracy: {top_k_acc * 100:.4f}%")
-    print(f"Perplexity: {math.exp(test_loss)}") # Perplexity = e^{cross_entropy_loss}
+        print(generated_text)
 
 
 if __name__ == "__main__":
