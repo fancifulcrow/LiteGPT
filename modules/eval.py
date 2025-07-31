@@ -12,9 +12,9 @@ def generate_text(
         model: LiteGPT, 
         tokenizer, 
         prompt, 
-        max_new_tokens: int = 128, 
-        temperature: float = 1.0, 
-        top_p: float = 1.0,
+        max_new_tokens: int = 256, 
+        temperature: float = 0.9, 
+        top_p: float = 0.9,
         top_k: Optional[int] = None, 
         device: Optional[str] = None
     ) -> str:
