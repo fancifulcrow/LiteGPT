@@ -1,9 +1,9 @@
 model:
   context_length: 128
-  d_model: 256
-  num_heads: 8
+  d_model: 128
+  num_heads: 4
   num_layers: 4
-  ff_dim: 512
+  ff_dim: 256
   dropout: 0.1
 
 data:
@@ -13,6 +13,6 @@ data:
 
 training:
   batch_size: 32
-  num_epochs: 5
+  num_epochs: 20
   learning_rate: 0.0001
   use_scheduler: False
