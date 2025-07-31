@@ -1,7 +1,6 @@
 matplotlib==3.10.3
 numpy==2.3.1
-packaging==25.0
 PyYAML==6.0.2
 tiktoken==0.9.0
-torch==2.7.1
+torch==2.7.1+cu126
 tqdm==4.67.1
