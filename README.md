@@ -54,10 +54,9 @@ You can customize the behavior of the program using the following command-line a
 | `--prompt`  | Prompt for text generation                           |
 | `--weights` | Path to a `.pth` model file                          |
 
-### Generated Samples
+## Generated Samples
 
 > And it is only when the elastic is an important-sided horn may be used in the shape of a large whale, and hangs down in his head-bone earrings: he only accidentally left board saw a cuttingist in a body. Of these three years of the White Whale, it is well known. He has long been for years been a small indeed peculiar fer, and is it not yet in general. He is the mere chance of seeing you, though a ferocity of the matter, in the matter, has not perceptible reluctance.
-
 
 
 > “You have a good pawnbroker’s business.”
