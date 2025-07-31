@@ -54,18 +54,6 @@ def main() -> None:
     num_epochs = config["training"]["num_epochs"]
     use_scheduler = config["training"]["use_scheduler"]
 
-    dataset = TextDataset(
-        tokenizer=tokenizer, 
-        context_length=context_length,
-        stride=stride,
-        folder_path=data_path
-    )
-
-    train_dataset, test_dataset = split_dataset(dataset, train_size=0.8, random_state=42)
-
-    train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
-    test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
-
     model = LiteGPT(
         vocab_size=vocab_size,
         context_length=context_length,
@@ -84,20 +72,32 @@ def main() -> None:
         print(f"Loaded pretrained LiteGPT weights from {args.weights}")
         logging.info(f"Loaded pretrained LiteGPT weights from {args.weights}")
 
-    optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epochs) if use_scheduler else None
-
     print(f"Total Number of Parameters: {count_parameters(model)}")
     logging.info(f"Total Number of Parameters: {count_parameters(model)}")
-
-    # Train
-    if args.mode in {"train"}:
-        losses = train_gpt(model, optimizer, train_dataloader, num_epochs, device, scheduler=scheduler)
-        loss_curve(losses, title="Training Loss")
-        is_trained = True
-
-    # Evaluate
+    
     if args.mode in {"train", "evaluate"}:
+        dataset = TextDataset(
+            tokenizer=tokenizer, 
+            context_length=context_length,
+            stride=stride,
+            folder_path=data_path
+        )
+
+        train_dataset, test_dataset = split_dataset(dataset, train_size=0.8, random_state=42)
+
+        train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+        test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
+
+        # Train
+        if args.mode == "train":
+            optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=0.005)
+            scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epochs) if use_scheduler else None
+
+            losses = train_gpt(model, optimizer, train_dataloader, num_epochs, device, scheduler=scheduler)
+            loss_curve(losses, title="Training Loss")
+            is_trained = True
+
+        # Evaluate
         if not is_trained:
             raise ValueError("Evaluation requires a pretrained model. Specify with --weights or train from scratch")
 
