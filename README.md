@@ -1,61 +1,98 @@
 # LiteGPT
 
-LiteGPT is a lightweight implementation of the GPT architecture, designed for both learning and experimentation. This repository provides the code necessary to train your own GPT-like models, with a focus on simplicity and adaptability.
+LiteGPT is a minimal, flexible implementation of the GPT architecture built with PyTorch. It's designed for learning, experimentation, and lightweight use cases, making it ideal for those interested in the inner workings of transformer-based language models.
 
-## Requirements
-
-Install the dependencies by running:
-```
-pip install torch tiktoken numpy matplotlib pyyaml tqdm
-```
-
-## Configuration
-
-You can customize your model through the `config/config.yaml` file. It allows you to modify the following:
-
-- **Model Architecture:** Dimension of feedforward layers, number of layers, number of attention heads, embedding size, context length, dropout
-- **Training Parameters:** Learning rate, batch size, number of epochs.
-- **Dataset Settings:** Path to your dataset, stride
-
-## The Pre-Trained Model
-
-The pre-trained LiteGPT model is available for download [here](https://github.com/fancifulcrow/LiteGPT/releases/download/v0.0.1/litegpt_model.pth). It has almost **28 million** parameters.
-
-### Tokenization
-LiteGPT utilizes the **GPT-2 tokenizer** from the `tiktoken` library.
-
-### Dataset
-This model has been trained on a dataset featuring texts from the following books, sourced from [Project Gutenberg](https://www.gutenberg.org/):
+## Dataset
+The model was been trained on a dataset featuring texts from the following public domain books, sourced from [Project Gutenberg](https://www.gutenberg.org/):
 
 - *Frankenstein* by Mary Shelley
 - *The Adventures of Sherlock Holmes* by Arthur Conan Doyle
 - *Metamorphosis* by Franz Kafka
 - *The Great Gatsby* by F. Scott Fitzgerald
+- *Moby Dick* by Herman Melville
 
-### Training Loss Curve
-The model was trained for 100 epochs. Below is the training curve of the loss over training steps.
+## Pre-Trained Model
 
-<p align="center">
-<img src="images/training_loss.png" alt="training loss">
-</p>
+Download the pretrained weights [here](https://github.com/fancifulcrow/LiteGPT/releases/download/v0.0.1/litegpt_model.pth). 
 
-### Evalutation
-The model achieve the following metrics on the test set:
-- **Cross Entropy Loss:** 3.7223
-- **Top-5 Accuracy:** 55.9533%
-- **Perplexity**: 41.3594
+With the default configuration, LiteGPT has **13 million** parameters. It utilizes the **GPT-2 tokenizer** from the `tiktoken` library.
+
+## Installation
+
+1. Clone the repository
+    ```bash
+    git clone https://github.com/fancifulcrow/LiteGPT.git
+    cd LiteGPT
+    ```
+
+2. Install the required dependencies by running:
+    ```bash
+    pip install -r requirements
+    ```
+    Or
+    ```bash
+    pip install torch tiktoken numpy matplotlib pyyaml tqdm
+    ```
+
+## Configuration
+
+All training and model parameters are defined in `config/default.yaml`. You can modify this file directly or supply a custom configuration using the `--config` flag when running the script.
+
+## Usage
+
+To run the main script, use:
+
+```bash
+python3 main.py
+```
+
+You can customize the behavior of the program using the following command-line arguments:
+| Argument    | Description                                          |
+| ----------- | ---------------------------------------------------- |
+| `--config`  | Path to config file (default: `config/default.yaml`) |
+| `--mode`    | `train`, `inference`, or `evaluate`                  |
+| `--prompt`  | Prompt for text generation                           |
+| `--weights` | Path to a `.pth` model file                          |
+
 
 ### Generated Samples
 
-> ‘Very strange conditions.“And and the hall, and it all these days on the function of the duster had removed to misery; but you, ‘Excellent man G, however, the Union Jack with matters which I desired to wear to my mind of Safie had been in the banking institute; I had cramped and the beings of a cool and break a haunting loneliness sometimes, when sunk in Jackson” said Tom’s body was the side, with a dead hare just supposed to follow at me, I have only his waylott’ve got mixed in October were written in his profession
+```markdown
+And it is only when the elastic is an important-sided horn may be used in the shape of a large whale, and hangs down in his head-bone earrings: he only accidentally left board saw a cuttingist in a body. Of these three years of the White Whale, it is well known. He has long been for years been a small indeed peculiar fer, and is it not yet in general. He is the mere chance of seeing you, though a ferocity of the matter, in the matter, has not perceptible reluctance.
+```
 
-> It’s father, and I believe, “You shall the drink, in the changes made the untid and to. They seemed to be seen except to our to remember the ramble of the class. Hudson is the first believed them to Found a day, they had never set a minute, I am now,“Were there was about the steps which I heard a companion had, but confirm his eyes under my hand, or none, we erected a widower and to the eaves. But the edge of those of men.” 
+```markdown
+“You have a good pawnbroker’s business.”
 
+“What is our saying,” he remarked decisively.
 
-> It was the scent and peeping sit there is entirely the watchers of the Grand Canal; the surname of the real young the dawn be convinced, but she insisted. And she had left, and I endeavoured to the words of Switzerland, and I would have watched by a romantic manner, and his daughter attended him up the favourite plan, I said the receptacle of grief and you possibly find the whole he informed me. The shutting to fetch his face peeled
+“But the sailors had on an attack. “That’s a great difference between the affair and your mother’s in front of me.”
 
+“Is this Miss Baker?”
+
+“Yes.”
+
+“You can’t understand it.”
+
+“You can’t live in the matter,” said Wilson. “She’s only married …”
+
+I insisted with him and I spoke of her strong emotion.
+```
+
+```markdown
+—that’s inexorable!”
+
+“Now,” said Gatsby, and with his expressive nose. “but it’s only a moment.”
+
+“It’s only a moment.”
+
+“A hard driver was not absolutely uncommunicable forever.’s when you will.”
+
+“I’m paid a party”, old man, “or wait here and there unrestfully,” he said. “I’ll call up Daisy with me—”
+
+The telephone rang inside—she said well with the sight into the house there, gently subsiding toward her beautiful and lovely tree accompanied her beautiful kitchen and strolled across the room. She was delighted to see that all the windows were sleeping in the dark gentle sky. The moon had long been accustomed to the sun, and a balust religions of the sun had risen higher, and a wildness in the morning, when a fire, slant, after the Parsee’s eyes came a burst of light from its flannel, and blue and blue a figure in a clump of laurelop was still a hideous and joy
+```
 ## Additional Reading
 
 - A. Vaswani et al., *[Attention is All You Need](https://arxiv.org/abs/1706.03762)*, 2017
-- T. Brown et al., *[Language Models are Few-Shot Learners](https://arxiv.org/abs/2005.14165)*, 2020
 - Andrej Karpathy, [Let's build GPT: from scratch, in code, spelled out](https://www.youtube.com/watch?v=kCc8FmEb1nY), YouTube Video, 2023
