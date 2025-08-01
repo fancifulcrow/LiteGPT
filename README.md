@@ -27,7 +27,7 @@ With the default configuration, LiteGPT has **13 million** parameters. It utiliz
 
 2. Install the required dependencies by running:
     ```bash
-    pip install -r requirements
+    pip install -r requirements.txt
     ```
     Or
     ```bash
